@@ -2,7 +2,7 @@
 
 MIS 612 | Fundamentals of Cloud Computing | Fall 2026 | Project 2: Enterprise Multi-Cloud Solution
 
-**Team:** [Team name]
+**Team:** [Group 3]
 
 A three-part project for the fictional company AeroForge Precision Components:
 
@@ -16,7 +16,7 @@ A three-part project for the fictional company AeroForge Precision Components:
 
 | Role | Name | GitHub |
 |---|---|---|
-| Team Lead / Solution Architect | [Your name] | [@username] |
+| Team Lead / Solution Architect | [Charmaine Aggson] | [@Charmaine001] |
 | Data Engineer, Ingestion | [Name] | [@username] |
 | Data Engineer, Processing & Warehouse | [Name] | [@username] |
 | Data Scientist / ML | [Name] | [@username] |
