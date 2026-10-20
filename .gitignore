@@ -1,0 +1,36 @@
+# Credentials and secrets: NEVER commit these
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials
+config.json.local
+.aws/
+aws_credentials*
+*secret*
+*token*
+
+# Raw data pack (confirm with instructor before committing data)
+data/
+datapack/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Node / IaC
+node_modules/
+cdk.out/
+.terraform/
+*.tfstate
+*.tfstate.*
