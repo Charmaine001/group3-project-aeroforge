@@ -20,7 +20,7 @@ A three-part project for the fictional company AeroForge Precision Components:
 | Data Engineer, Ingestion | [Name] | [@username] |
 | Data Engineer, Processing & Warehouse | [Name] | [@username] |
 | Data Scientist / ML | [Name] | [@username] |
-| Security, FinOps & AI Agents | [Name] | [@username] |
+| Security, FinOps & AI Agents | [Luke Youngdahl] | [@lyoungdahl] |
 | AI Agents & Ontology | [Name] | [@username] |
 
 Roles may rotate between Phase 1 (design) and Phase 2 (build).
