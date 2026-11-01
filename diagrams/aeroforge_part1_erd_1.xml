@@ -1,0 +1,167 @@
+<mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <!-- TITLE & PROVISIONAL NOTICE BANNER -->
+    <mxCell id="title_banner" value="AeroForge Precision Components — Part 1: Conformed &quot;Plant-to-P&amp;L&quot; Star Schema ERD (S3 Gold Apache Iceberg + Amazon Redshift External Schema)&#xa;WARNING: ALL TABLES &amp; COLUMNS ARE PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#14202E;strokeColor=#0F172A;fontColor=#FFFFFF;fontSize=15;fontStyle=1;align=left;spacingLeft=20;" vertex="1" parent="1">
+      <mxGeometry x="30" y="15" width="1860" height="55" as="geometry" />
+    </mxCell>
+
+    <mxCell id="legend_box" value="Legend:  [PK] Surrogate/Natural Primary Key   |   [FK] Foreign Key   |   Gold Tables Stored as Apache Iceberg on Amazon S3   |   Served via Redshift External Schema + Derived MVs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F1D8;strokeColor=#A5830D;fontColor=#14202E;fontSize=11;fontStyle=1;align=right;spacingRight=15;" vertex="1" parent="1">
+      <mxGeometry x="860" y="25" width="1010" height="35" as="geometry" />
+    </mxCell>
+
+    <!-- ================================================================= -->
+    <!-- LEFT COLUMN: CONFORMED DIMENSIONS (OPERATIONAL & ENTERPRISE)      -->
+    <!-- ================================================================= -->
+    <mxCell id="dim_date" value="dim_date&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] date_key (INT, YYYYMMDD)&#xa;     calendar_date (DATE)&#xa;     fiscal_year (INT)&#xa;     fiscal_quarter (STRING)&#xa;     fiscal_period_month (INT)&#xa;     is_business_day (BOOLEAN)&#xa;     is_month_end_close_window (BOOLEAN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="40" y="95" width="440" height="175" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_plant" value="dim_plant&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] plant_key (BIGINT)&#xa;[NK] plant_code (STRING: 'WIC','OKC','QRO')&#xa;     plant_name (STRING)&#xa;     country_code (STRING: 'US','MX')&#xa;     company_code (STRING: US vs MX Legal Entity)&#xa;     local_currency_code (STRING: 'USD','MXN')&#xa;     scheduled_shifts_per_day (INT: 3, 2, 3)&#xa;     aws_region_home (STRING: 'us-east-1','mx-central-1')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="40" y="295" width="440" height="195" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_machine" value="dim_machine (SCD Type 2)&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] machine_key (BIGINT)&#xa;[NK] machine_id (STRING, e.g., 'WIC-CNC-03')&#xa;[FK] plant_key (BIGINT)&#xa;[FK] cost_center_key (BIGINT)&#xa;     machine_type (STRING: 5-Axis CNC, Drill, Autoclave,&#xa;                   Heat-Treat Furnace, CMM)&#xa;     criticality_class (STRING)&#xa;     ideal_cycle_time_minutes (DECIMAL(10,2))&#xa;     baseline_vibration_mm_s (DECIMAL(10,4))&#xa;     gateway_id (STRING)&#xa;     gateway_firmware_version (STRING)&#xa;     effective_start_ts (TIMESTAMP)&#xa;     effective_end_ts (TIMESTAMP)&#xa;     is_current (BOOLEAN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="40" y="515" width="440" height="285" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_program" value="dim_program&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] program_key (BIGINT)&#xa;[NK] program_code (STRING: 'SKYLARK','TALON','MERIDIAN')&#xa;     program_description (STRING: Business Jet,&#xa;                          Military Trainer, Regional Jet)&#xa;     customer_name (STRING: Northstar, Cobalt Defense,&#xa;                    Helios Aerospace)&#xa;     is_export_controlled (BOOLEAN: TRUE for TALON)&#xa;     allowed_access_group (STRING: 'US-Persons-Authorized')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE7E4;strokeColor=#B03A2E;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="40" y="825" width="440" height="205" as="geometry" />
+    </mxCell>
+
+    <!-- ================================================================= -->
+    <!-- CENTER COLUMN: CONFORMED FACT TABLES (S3 GOLD APACHE ICEBERG)     -->
+    <!-- ================================================================= -->
+    <mxCell id="fact_telemetry" value="fact_machine_telemetry_hourly (S3 Gold Iceberg)&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;Grain: 1 Row per Machine per Hour (Rolled up from 5-sec MQTT stream)&#xa;────────────────────────────────────────────────────────────────────&#xa;[PK] telemetry_hour_key (STRING)&#xa;[FK] date_key (INT)                  [FK] plant_key (BIGINT)&#xa;[FK] machine_key (BIGINT)            [FK] active_work_order_id (STRING)&#xa;     hour_start_utc (TIMESTAMP)&#xa;     scheduled_minutes (DECIMAL)     running_minutes (DECIMAL)&#xa;     downtime_minutes (DECIMAL)      event_count (BIGINT)&#xa;     avg_spindle_rpm (DECIMAL)       max_vibration_mm_s (DECIMAL)&#xa;     avg_temp_celsius (DECIMAL)      max_temp_celsius (DECIMAL)&#xa;     energy_consumed_kwh (DECIMAL)   ambient_temp_celsius (DECIMAL)&#xa;     vibration_alert_band_flag (BOOLEAN)&#xa;     ml_failure_prob_48h (DECIMAL)    unit_converted_from_f_flag (BOOLEAN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F1D8;strokeColor=#A5830D;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="550" y="95" width="560" height="235" as="geometry" />
+    </mxCell>
+
+    <mxCell id="fact_prod" value="fact_production_work_order (S3 Gold Iceberg — LF Row Filter: TALON)&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;Grain: 1 Row per MES Production Work Order&#xa;────────────────────────────────────────────────────────────────────&#xa;[PK] work_order_key (BIGINT)         [NK] work_order_id (STRING)&#xa;[FK] date_key (INT)                  [FK] plant_key (BIGINT)&#xa;[FK] machine_key (BIGINT)            [FK] part_key (BIGINT)&#xa;[FK] program_key (BIGINT)            [FK] material_key (BIGINT)&#xa;[FK] cost_center_key (BIGINT)&#xa;     order_start_ts (TIMESTAMP)      order_end_ts (TIMESTAMP)&#xa;     scheduled_run_minutes (DECIMAL) actual_run_minutes (DECIMAL)&#xa;     parts_completed_qty (INT)       good_parts_qty (INT)&#xa;     scrapped_parts_qty (INT)        reworked_parts_qty (INT)&#xa;     oee_availability_pct (DECIMAL)  oee_performance_pct (DECIMAL)&#xa;     oee_quality_pct (DECIMAL)       oee_total_pct (DECIMAL)&#xa;     standard_unit_cost_usd (DECIMAL) copq_scrap_rework_usd (DECIMAL)&#xa;     ml_scrap_risk_score (DECIMAL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F1D8;strokeColor=#A5830D;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="550" y="350" width="560" height="270" as="geometry" />
+    </mxCell>
+
+    <mxCell id="fact_maint" value="fact_maintenance_work_order &amp; fact_quality_inspection (S3 Gold Iceberg)&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;Grain: 1 Row per CMMS Maintenance Order / 1 Row per CMM Inspection&#xa;────────────────────────────────────────────────────────────────────&#xa;[PK] maintenance_order_key (BIGINT)  [NK] maintenance_order_id (STRING)&#xa;[FK] date_key (INT)                  [FK] plant_key (BIGINT)&#xa;[FK] machine_key (BIGINT)            [FK] cost_center_key (BIGINT)&#xa;[FK] related_work_order_key (BIGINT) [FK] inspection_id (STRING)&#xa;     order_priority (STRING: P1..P4) failure_mode_code (STRING)&#xa;     unplanned_downtime_hours (DEC)  repair_cost_usd (DECIMAL)&#xa;     cmm_dimension_deviation (DEC)   cmm_pass_fail_flag (BOOLEAN)&#xa;     created_by_agent_flag (BOOLEAN) hitl_approver_user_id (STRING)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F1D8;strokeColor=#A5830D;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="550" y="640" width="560" height="215" as="geometry" />
+    </mxCell>
+
+    <mxCell id="fact_fin" value="fact_financial_gl_variance &amp; fact_purchase_price_variance (S3 Gold Iceberg)&#xa;★ AUTHORITATIVE FINANCE &amp; DIGITAL-THREAD P&amp;L FACT ★&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;Grain: 1 Row per ERP GL Journal Line / AP Invoice Line&#xa;────────────────────────────────────────────────────────────────────&#xa;[PK] gl_journal_line_key (BIGINT)    [NK] gl_journal_id_line (STRING)&#xa;[FK] date_key (INT)                  [FK] plant_key (BIGINT)&#xa;[FK] cost_center_key (BIGINT)        [FK] gl_account_key (BIGINT)&#xa;[FK] machine_key (BIGINT, nullable)  [FK] work_order_key (BIGINT, null)&#xa;[FK] maintenance_order_key (BIGINT)  [FK] ap_invoice_id (STRING, null)&#xa;[FK] supplier_key (BIGINT, nullable) [FK] material_key (BIGINT, null)&#xa;[FK] program_key (BIGINT, nullable)&#xa;     transaction_currency (STRING)   fx_rate_to_usd (DECIMAL(12,6))&#xa;     actual_amount_local (DECIMAL)   actual_amount_usd (DECIMAL)&#xa;     budget_amount_usd (DECIMAL)     standard_cost_usd (DECIMAL)&#xa;     pnl_variance_usd (DECIMAL)      ppv_amount_usd (DECIMAL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F1D8;strokeColor=#A5830D;strokeWidth=3;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="550" y="875" width="560" height="275" as="geometry" />
+    </mxCell>
+
+    <!-- ================================================================= -->
+    <!-- RIGHT COLUMN: CONFORMED DIMENSIONS (PRODUCT, SUPPLY & FINANCE)    -->
+    <!-- ================================================================= -->
+    <mxCell id="dim_part" value="dim_part (SCD Type 2 — LF Row Filter: TALON)&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] part_key (BIGINT)&#xa;[NK] part_number (STRING)&#xa;[FK] program_key (BIGINT)&#xa;[FK] primary_material_key (BIGINT)&#xa;     part_description (STRING: Titanium Frame,&#xa;                       Fuselage Skin, Composite Fitting)&#xa;     standard_material_qty_kg (DECIMAL(10,3))&#xa;     standard_unit_cost_usd (DECIMAL(12,2))&#xa;     is_export_controlled (BOOLEAN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="95" width="440" height="205" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_material" value="dim_material&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] material_key (BIGINT)&#xa;[NK] material_code (STRING)&#xa;     material_type (STRING: 'Titanium','Aluminum',&#xa;                    'Carbon-Fiber Composite')&#xa;     unit_of_measure (STRING: 'KG','LB','SQ_M')&#xa;     standard_price_per_uom_usd (DECIMAL(12,4))&#xa;     commodity_index_symbol (STRING)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="325" width="440" height="175" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_supplier" value="dim_supplier&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] supplier_key (BIGINT)&#xa;[NK] supplier_id (STRING)&#xa;     supplier_name (STRING)&#xa;     country_code (STRING)&#xa;     primary_commodity (STRING)&#xa;     payment_terms_code (STRING)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="525" width="440" height="165" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_cost_center" value="dim_cost_center&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] cost_center_key (BIGINT)&#xa;[NK] cost_center_code (STRING)&#xa;[FK] plant_key (BIGINT)&#xa;     cost_center_name (STRING)&#xa;     department_category (STRING: Machining, Assembly,&#xa;                          Maintenance, Quality, Overhead)&#xa;     controller_owner_role (STRING)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="715" width="440" height="185" as="geometry" />
+    </mxCell>
+
+    <mxCell id="dim_gl_account" value="dim_gl_account&#xa;[PROVISIONAL — TO BE RECONCILED WITH DATA_DICTIONARY.md]&#xa;──────────────────────────────────────────────&#xa;[PK] gl_account_key (BIGINT)&#xa;[NK] gl_account_number (STRING)&#xa;     gl_account_name (STRING)&#xa;     account_type (STRING: Revenue, COGS, Scrap/COPQ,&#xa;                   Maintenance Exp, PPV, Energy Utility)&#xa;     sox_in_scope_flag (BOOLEAN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3EDF9;strokeColor=#1F5FA8;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=8;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="925" width="440" height="185" as="geometry" />
+    </mxCell>
+
+    <!-- ================================================================= -->
+    <!-- FAR RIGHT: REDSHIFT SERVING & DERIVED MATERIALIZED VIEWS          -->
+    <!-- ================================================================= -->
+    <mxCell id="redshift_serving" value="Amazon Redshift Serverless&#xa;Serving &amp; Derived Layer&#xa;──────────────────────────&#xa;1. External Schema Mount:&#xa;   gold_iceberg.*&#xa;   (Zero-Copy S3 Gold Read)&#xa;&#xa;2. Derived Materialized Views&#xa;   (Pre-Computed, Auto-Refresh):&#xa;   • mv_daily_plant_oee&#xa;   • mv_daily_copq_by_machine&#xa;   • mv_monthly_pnl_variance&#xa;   • mv_titanium_ppv_exposure&#xa;&#xa;3. Governed Semantic Views:&#xa;   • v_variance_analyst_agent&#xa;   • v_quicksight_exec_brief" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E2F3EA;strokeColor=#1D7A4F;strokeWidth=2;fontColor=#0F172A;fontSize=11;fontFamily=JetBrains Mono,monospace;align=left;spacingLeft=10;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+      <mxGeometry x="1650" y="325" width="240" height="420" as="geometry" />
+    </mxCell>
+
+    <!-- ================================================================= -->
+    <!-- STAR-SCHEMA FK -> PK RELATIONSHIPS                                -->
+    <!-- ================================================================= -->
+    <mxCell id="rel_date_tel" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_date" target="fact_telemetry">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_date_prod" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_date" target="fact_prod">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_plant_tel" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_plant" target="fact_telemetry">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_plant_prod" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_plant" target="fact_prod">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_plant_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_plant" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_mach_tel" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_machine" target="fact_telemetry">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_mach_prod" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_machine" target="fact_prod">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_mach_maint" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_machine" target="fact_maint">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_mach_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_machine" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_prog_prod" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#B03A2E;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_program" target="fact_prod">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_prog_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#B03A2E;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_program" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Right-side dimensions to facts -->
+    <mxCell id="rel_part_prod" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_part" target="fact_prod">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_mat_part" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_material" target="dim_part">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_mat_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_material" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_sup_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_supplier" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_cc_maint" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=1.5;fontSize=10;" edge="1" parent="1" source="dim_cost_center" target="fact_maint">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_cc_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_cost_center" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="rel_gl_fin" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1F5FA8;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="dim_gl_account" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Digital Thread Fact-to-Fact Traceability Links -->
+    <mxCell id="rel_wo_fin" value="Digital Thread Trace" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A5830D;strokeWidth=2;strokeDashArray=4 4;fontSize=10;fontStyle=1;" edge="1" parent="1" source="fact_prod" target="fact_fin">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="525" y="485" />
+          <mxPoint x="525" y="1010" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="rel_maint_fin" value="Digital Thread Trace" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A5830D;strokeWidth=2;strokeDashArray=4 4;fontSize=10;fontStyle=1;" edge="1" parent="1" source="fact_maint" target="fact_fin">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Gold Iceberg -> Redshift External Schema -->
+    <mxCell id="rel_gold_rs" value="External Schema Mount" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1D7A4F;strokeWidth=2;fontSize=10;fontStyle=1;" edge="1" parent="1" source="fact_prod" target="redshift_serving">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1140" y="485" />
+          <mxPoint x="1140" y="310" />
+          <mxPoint x="1770" y="310" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>
