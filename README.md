@@ -18,7 +18,7 @@ A three-part project for the fictional company AeroForge Precision Components:
 |---|---|---|
 | Team Lead / Solution Architect | [Charmaine Aggson] | [@Charmaine001] |
 | Data Engineer, Ingestion | [Name] | [@username] |
-| Data Engineer, Processing & Warehouse | [Name] | [@username] |
+| Data Engineer, Processing & Warehouse | [Neha] | [@Nehaofficial05] |
 | Data Scientist / ML | [Name] | [@username] |
 | Security, FinOps & AI Agents | [Luke Youngdahl] | [@lyoungdahl] |
 | AI Agents & Ontology | [Name] | [@username] |
