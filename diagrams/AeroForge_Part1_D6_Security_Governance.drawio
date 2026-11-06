@@ -1,0 +1,91 @@
+<mxfile host="app.diagrams.net">
+ <diagram name="P1-6 Security &amp; Governance" id="aeroforge-luke-1">
+  <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="778" math="0" shadow="0">
+   <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="c3" value="&lt;b&gt;AeroForge — Part 1, Deliverable 6: Security, Compliance &amp;amp; Governance Design&lt;/b&gt;&lt;br&gt;Who can see what (IAM + Lake Formation) | Encryption tiers | TALON export control | Mexico residency | SOX audit trail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#263238;strokeColor=#263238;fontColor=#FFFFFF;fontSize=13;align=left;verticalAlign=middle;spacingLeft=14;" vertex="1" parent="1">
+     <mxGeometry x="40" y="20" width="1820" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="c4" value="1. IDENTITY &amp;amp; PEOPLE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#7B1FA2;strokeWidth=2;dashed=1;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontStyle=1;fontSize=12;arcSize=2;" vertex="1" parent="1">
+     <mxGeometry x="40" y="100" width="380" height="421" as="geometry" />
+    </mxCell>
+    <mxCell id="c5" value="&lt;b&gt;IAM Identity Center (SSO + MFA)&lt;/b&gt;&lt;br&gt;• Workforce users sign in once; MFA required&lt;br&gt;• Session attributes: isUSPerson, plant_code, role&lt;br&gt;• US-Persons-TALON group comes from a verified identity attribute; nobody self-assigns" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="52" y="134" width="356" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="c6" value="&lt;b&gt;Personas&lt;/b&gt;&lt;br&gt;• Plant manager, maintenance planner / tech, quality engineer&lt;br&gt;• Plant controller, corporate FP&amp;amp;A / CFO, data scientist&lt;br&gt;• Internal auditor (read-only), pipeline roles, data engineers (metadata only; break-glass for data)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#616161;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="52" y="241" width="356" height="108" as="geometry" />
+    </mxCell>
+    <mxCell id="c7" value="&lt;b&gt;Segregation of duties (SOX)&lt;/b&gt;&lt;br&gt;• Lake Formation admin, pipeline deployer and finance-data approver are three different roles&lt;br&gt;• Changes go through CI/CD with pull-request approval&lt;br&gt;• Humans are read-only in the gold zone" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="52" y="363" width="356" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="c8" value="2. ACCESS PATHS (user identity travels with every call)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#2E7D32;strokeWidth=2;dashed=1;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontStyle=1;fontSize=12;arcSize=2;" vertex="1" parent="1">
+     <mxGeometry x="450" y="100" width="400" height="421" as="geometry" />
+    </mxCell>
+    <mxCell id="c9" value="&lt;b&gt;AI agents (Bedrock AgentCore)&lt;/b&gt;&lt;br&gt;• AgentCore Identity passes the user's token to each tool call&lt;br&gt;• Agent roles hold no standing data grants&lt;br&gt;• Guardrails block PII and off-topic output only; they are not access control&lt;br&gt;• Knowledge Base: TALON SOPs excluded or metadata-filtered" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="462" y="134" width="376" height="108" as="geometry" />
+    </mxCell>
+    <mxCell id="c10" value="&lt;b&gt;Dashboards (QuickSight)&lt;/b&gt;&lt;br&gt;• Row-level security by plant&lt;br&gt;• VPC connection to the private serve tier" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="462" y="256" width="376" height="63" as="geometry" />
+    </mxCell>
+    <mxCell id="c11" value="&lt;b&gt;Warehouse &amp;amp; lake queries&lt;/b&gt;&lt;br&gt;• Redshift: row-level security + identity propagation; materialized views keep the same filters&lt;br&gt;• Athena / Spectrum paths enforced by Lake Formation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="462" y="333" width="376" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="c12" value="&lt;b&gt;Data science (SageMaker, VPC-only)&lt;/b&gt;&lt;br&gt;• Silver + gold, non-TALON, unless the user is in US-Persons-TALON&lt;br&gt;• TALON-trained models stay in the TALON account" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="462" y="425" width="376" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="c13" value="3. ENFORCEMENT (what says yes or no)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#2E7D32;strokeWidth=2;dashed=1;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontStyle=1;fontSize=12;arcSize=2;" vertex="1" parent="1">
+     <mxGeometry x="880" y="100" width="420" height="421" as="geometry" />
+    </mxCell>
+    <mxCell id="c14" value="&lt;b&gt;AWS Lake Formation (central governance account)&lt;/b&gt;&lt;br&gt;• LF-tags: Domain, Zone, Sensitivity, Plant, Residency&lt;br&gt;• Persona × domain grants by tag, so new plants only need new tag values&lt;br&gt;• Cell filter: program_code &amp;lt;&amp;gt; 'TALON' for everyone outside US-Persons-TALON&lt;br&gt;• Sensitivity = pii columns excluded; Macie scans for leaks&lt;br&gt;• Cross-account sharing through RAM and resource links" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="892" y="134" width="396" height="138" as="geometry" />
+    </mxCell>
+    <mxCell id="c15" value="&lt;b&gt;KMS key policies (4 tiers)&lt;/b&gt;&lt;br&gt;• CMK #1 commercial and SOX finance&lt;br&gt;• CMK #2 TALON: key policy requires isUSPerson = true&lt;br&gt;• CMK #3 Mexico: never leaves mx-central-1&lt;br&gt;• CMK #4 audit archive" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="892" y="286" width="396" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="c16" value="&lt;b&gt;Preventive guardrails (AWS Organizations SCPs)&lt;/b&gt;&lt;br&gt;• Region allow-list; TALON OU limited to US Regions&lt;br&gt;• Deny public S3; deny cross-border replication from Mexico" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="892" y="393" width="396" height="63" as="geometry" />
+    </mxCell>
+    <mxCell id="c17" value="4. DATA ZONES" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#1565C0;strokeWidth=2;dashed=1;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontStyle=1;fontSize=12;arcSize=2;" vertex="1" parent="1">
+     <mxGeometry x="1330" y="100" width="530" height="421" as="geometry" />
+    </mxCell>
+    <mxCell id="c18" value="&lt;b&gt;Commercial lakehouse (core data platform account)&lt;/b&gt;&lt;br&gt;• Bronze / silver / gold Iceberg tables, encrypted with CMK #1&lt;br&gt;• Finance tables: S3 Object Lock, 7-year SOX retention&lt;br&gt;• Non-TALON gold prefix is the only path shared with Part 2 (read-only role)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="1342" y="134" width="506" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="c19" value="&lt;b&gt;TALON account (US-only export-control boundary)&lt;/b&gt;&lt;br&gt;• Separate account, S3 and key (CMK #2); only verified US persons&lt;br&gt;• Models and SOPs that use TALON data stay here&lt;br&gt;• Backups and DR copies go US-to-US only (us-east-1 / us-west-2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#C62828;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="1342" y="226" width="506" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="c20" value="&lt;b&gt;Mexico account (mx-central-1)&lt;/b&gt;&lt;br&gt;• HR, payroll and operator PII stay in country (CMK #3)&lt;br&gt;• Allow-listed export gate sends only de-identified MXN GL balances and plant rollups to the US" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#EF6C00;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="1342" y="318" width="506" height="78" as="geometry" />
+    </mxCell>
+    <mxCell id="c21" value="5. AUDIT &amp;amp; SOX EVIDENCE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#F9A825;strokeWidth=2;dashed=1;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontStyle=1;fontSize=12;arcSize=2;" vertex="1" parent="1">
+     <mxGeometry x="40" y="591" width="1820" height="147" as="geometry" />
+    </mxCell>
+    <mxCell id="c22" value="&lt;b&gt;What is logged&lt;/b&gt;&lt;br&gt;• CloudTrail data events, AWS Config, Lake Formation access logs&lt;br&gt;• GuardDuty, Security Hub and Macie findings&lt;br&gt;• Agent approval log (DynamoDB stream)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="52" y="625" width="430" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="c23" value="&lt;b&gt;Audit archive (security account)&lt;/b&gt;&lt;br&gt;• S3 Object Lock WORM, 7-year retention, CMK #4&lt;br&gt;• Workloads can write but not delete&lt;br&gt;• Internal auditor has read-only access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="504" y="625" width="430" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="c24" value="&lt;b&gt;SOX controls&lt;/b&gt;&lt;br&gt;• Change control through CI/CD and PR approval&lt;br&gt;• Segregation of duties (see column 1)&lt;br&gt;• Periodic access reviews with evidence kept 7 years" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#F9A825;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="956" y="625" width="430" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="c25" value="&lt;b&gt;Open items &amp;amp; assumptions&lt;/b&gt;&lt;br&gt;• TALON on commercial US Regions vs GovCloud: team decision (ADR-3)&lt;br&gt;• Telemetry becomes TALON-controlled once joined to a TALON work order&lt;br&gt;• No legal conclusions claimed; verify service syntax in AWS docs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#F57F17;fontSize=11;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;spacingRight=8;" vertex="1" parent="1">
+     <mxGeometry x="1408" y="625" width="430" height="93" as="geometry" />
+    </mxCell>
+    <mxCell id="e0_0" value="1. SSO + MFA + attributes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#37474F;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="c4" target="c8">
+     <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e0_1" value="2. Identity propagated" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#37474F;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="c8" target="c13">
+     <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e0_2" value="3. Filter + decrypt only if policy allows" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#37474F;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="c13" target="c17">
+     <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e0_3" value="4. Every access logged" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#37474F;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="c17" target="c21">
+     <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+   </root>
+  </mxGraphModel>
+ </diagram>
+</mxfile>
