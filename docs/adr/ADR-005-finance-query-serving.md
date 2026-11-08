@@ -79,6 +79,3 @@ Athena remains useful for flexible exploration and data-quality workloads. Howev
 - Amazon Athena – Capacity reservations: https://docs.aws.amazon.com/athena/latest/ug/capacity-management.html
 - Amazon QuickSight – Redshift trusted identity propagation: https://docs.aws.amazon.com/quick/latest/userguide/enabling-access-redshift.html
 
-## 8. AI-Use Disclosure
-
-This ADR was revised with generative AI assistance using the project draft and AWS official documentation. The project team must review the technical assumptions, confirm architecture-diagram consistency, and approve unresolved implementation and cost decisions before marking this ADR final.
