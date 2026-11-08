@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="Iq7bNxW_2M4J-Z15czZ7">
-    <mxGraphModel dx="1030" dy="562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2033" dy="1186" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -64,10 +64,10 @@
         <mxCell id="l4_curated" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=11;align=left;spacingLeft=12;fontStyle=1;" value="Amazon S3 — Curated Zone (Silver)&#xa;• Cleaned, Validated, Standardized Entities (Parquet/Iceberg)&#xa;• Conformed Keys across MES, CMMS, CMM, ERP [PROVISIONAL]" vertex="1">
           <mxGeometry height="100" width="500" x="1050" y="500" as="geometry" />
         </mxCell>
-        <mxCell id="l5_gold" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;strokeWidth=2;fontSize=11;align=left;spacingLeft=12;fontStyle=1;" value="Amazon S3 — Gold Zone (Apache Iceberg / S3 Tables)&#xa;[SINGLE AUTHORITATIVE SYSTEM OF RECORD]&#xa;• Conformed Plant-to-P&amp;L Star Schema [PROVISIONAL]&#xa;• Ready Daily by 07:00 CT | SOX Time-Travel &amp; ACID&#xa;• Read In-Place by Redshift &amp; Zero-Copy by Part 2 (Fabric/Snowflake)" vertex="1">
+        <mxCell id="l5_gold" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;strokeWidth=2;fontSize=11;align=left;spacingLeft=12;fontStyle=1;" value="Amazon S3 — Gold Zone (Apache Iceberg / S3 Tables)&lt;br&gt;[AUTHORITATIVE ANALYTICAL DATA LAYER]&lt;br&gt;• Governed Plant-to-P&amp;amp;L Data Products / Star Schema&lt;br&gt;• Daily 7;00 CT target; versioned &amp;amp; auditable&lt;br&gt;• Redshift: Validated external-table / Iceberg path query path&lt;div&gt;Part 2 cross-cloud access: separate validated design&lt;/div&gt;" vertex="1">
           <mxGeometry height="135" width="500" x="1050" y="650" as="geometry" />
         </mxCell>
-        <mxCell id="b_talon" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;strokeWidth=2;dashed=1;fontSize=11;fontStyle=1;align=left;spacingLeft=12;fontColor=#880E4F;" value="TALON EXPORT-CONTROLLED ISOLATION (ITAR / EAR)&#xa;US Region Only (us-east-1 / us-west-2) — US Persons Only&#xa;• Dedicated S3 Prefixes/Buckets + Separate AWS KMS CMK&#xa;• AWS Lake Formation Tag-Based Access Control (LF-TBAC)&#xa;  &amp; Row/Column Filters (program = &#39;TALON&#39; Restricted)&#xa;• Blocked from Unauthorized Cross-Cloud / Non-US Access" vertex="1">
+        <mxCell id="b_talon" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;strokeWidth=2;dashed=1;fontSize=11;fontStyle=1;align=left;spacingLeft=12;fontColor=#880E4F;" value="TALON EXPORT-CONTROLLED ISOLATION (ITAR / EAR)&lt;br&gt;US Region Only (us-east-1 / us-west-2) — US Persons Only&lt;br&gt;• Dedicated account / data boundary + KMS encryption&lt;div&gt;• IAM role controls + Lake Formation LF-TBAC and row / column filters&lt;/div&gt;&lt;div&gt;• Enforce authorization in Redshift, Athena, APIs &amp;amp; AgentCore&lt;br&gt;• Deny unauthorized cross-region / cross-cloud access&lt;/div&gt;" vertex="1">
           <mxGeometry height="165" width="500" x="1050" y="810" as="geometry" />
         </mxCell>
         <mxCell id="l6_part2_hook" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;dashed=1;fontSize=11;fontStyle=2;" value="Part 2 Multi-Cloud Zero-Copy Hook (No 3rd Physical Copy)&#xa;Microsoft OneLake S3 Shortcuts &amp; Snowflake External Volumes" vertex="1">
@@ -97,7 +97,7 @@
         <mxCell id="in2_alerts" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=11;align=left;spacingLeft=12;" value="Real-Time Shop-Floor Alerting&#xa;(Amazon SNS / EventBridge)&#xa;• Critical Machine Alarms within 60s&#xa;• Cell Lead &amp; On-Call Notifications" vertex="1">
           <mxGeometry height="110" width="360" x="2250" y="340" as="geometry" />
         </mxCell>
-        <mxCell id="in3_kb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=11;align=left;spacingLeft=12;" value="Amazon Bedrock Knowledge Bases&#xa;&amp; Amazon Bedrock Guardrails&#xa;• RAG over ~20K SharePoint SOPs &amp; Notes&#xa;• Guardrails: Block PII, Off-Topic &amp;&#xa;  Enforce User Entitlements (TALON)" vertex="1">
+        <mxCell id="in3_kb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=11;align=left;spacingLeft=12;" value="Amazon Bedrock Knowledge Bases&lt;br&gt;&amp;amp; Amazon Bedrock Guardrails&lt;br&gt;• RAG over ~20K SharePoint SOPs &amp;amp; Technician Notes&lt;br&gt;• Guardrails: Block PII, Off-Topic &amp;amp;&lt;br&gt;  Enforce User Entitlements (TALON)&lt;div&gt;• TALON access enforced by IAM / Lake Formation and tool authorization - NOT Guardrails&lt;/div&gt;" vertex="1">
           <mxGeometry height="130" width="360" x="2250" y="480" as="geometry" />
         </mxCell>
         <mxCell id="in4_agentcore" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#4A148C;strokeWidth=2;fontSize=11;align=left;spacingLeft=12;fontStyle=1;" value="Amazon Bedrock AgentCore&#xa;(Foundation Models: Anthropic Claude)&#xa;• AgentCore Runtime, Memory, Identity, Observability&#xa;• AgentCore Gateway (MCP Tools via AWS Lambda)&#xa;• Multi-Agent System:&#xa;  1. Supervisor (&#39;AeroForge Copilot&#39;)&#xa;  2. Maintenance Advisor (Health + SOP RAG)&#xa;  3. Variance Analyst (Governed Text-to-SQL)&#xa;  4. Supply &amp; Cost Agent (AP + Commodity PPV)" vertex="1">
