@@ -1,0 +1,352 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="RnPld-EBxI8Q8sdSX1fR">
+    <mxGraphModel dx="2711" dy="1479" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title_banner" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1B263B;strokeColor=#0D1B2A;fontColor=#FFFFFF;fontStyle=1;fontSize=13;align=left;spacingLeft=20;" value="AeroForge Precision Components — Part 1: AWS Enterprise Logical Architecture (Plant-to-P&amp;L Digital Thread)&#xa;Scope: Scenario A (3-Plant Pilot: WIC, OKC, QRO | 600 Machines) to Scenario B (12 Plants | 2,400 Machines, 20,000 msg/s Burst) + Cimarron (Site 13)" vertex="1">
+          <mxGeometry height="60" width="2040" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F9FA;strokeColor=#343A40;strokeWidth=1.5;fontColor=#212529;fontSize=10.5;align=left;spacingLeft=12;" value="&lt;b&gt;LEGEND (Layers, Boundaries &amp;amp; Numbered Flows ①–㉜)&lt;/b&gt;&#xa;■ Blue: Streaming | ■ Gray: Batch/CDC | ■ Green: Lakehouse | ■ Orange: Serve/ML | ■ Purple: BI &amp;amp; Agentic AI&#xa;■ Red Dashed: Under-60s Alert / DQ Reject | ■ Amber Dashed: Mexico (mx-central-1) | ■ Pink Dashed: TALON (US-Only)" vertex="1">
+          <mxGeometry height="60" width="540" x="2100" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_sources" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F9FA;strokeColor=#6C757D;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#343A40;spacingTop=10;" value="1. SOURCES (Plants &amp; External)" vertex="1">
+          <mxGeometry height="1010" width="360" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_edge" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9ECEF;strokeColor=#495057;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Plant Shop-Floor Machines&lt;/b&gt;&#xa;• CNC, Drill, Autoclave, Furnace, CMM&#xa;• OPC UA to MQTT via AWS IoT Greengrass&#xa;• Strips Operator IDs at Edge | 15m Local Spool&#xa;• ~1.5 TB/mo (2,400 Machines across 12 Plants)" vertex="1">
+          <mxGeometry height="105" width="310" x="65" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_mes" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9ECEF;strokeColor=#495057;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;On-Premises MES (SQL Server)&lt;/b&gt;&#xa;• Production Orders (~60K orders/mo)&#xa;• Asset, Machine, Part &amp;amp; Material Master Data&#xa;• Transaction Log MS-CDC Enabled" vertex="1">
+          <mxGeometry height="90" width="310" x="65" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_cmm" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9ECEF;strokeColor=#495057;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Quality CMM &amp;amp; SaaS CMMS&lt;/b&gt;&#xa;• SaaS CMMS REST API (~4K orders/mo JSONL&#xa;  + Technician Free-Text Repair Notes)&#xa;• CMM Inspection Exports (~150K/mo CSV)" vertex="1">
+          <mxGeometry height="95" width="310" x="65" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_erp" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9ECEF;strokeColor=#495057;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;On-Premises ERP (Corporate Finance)&lt;/b&gt;&#xa;• GL, AP, Budget &amp;amp; Standard Cost (~2M lines/mo)&#xa;• Master Data: Plants, Suppliers, Cost Centers, GL&#xa;• USD &amp;amp; MXN Nightly Extracts (23:00 CT SFTP)" vertex="1">
+          <mxGeometry height="95" width="310" x="65" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="s5_ext" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9ECEF;strokeColor=#495057;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;External REST APIs &amp;amp; SharePoint Docs&lt;/b&gt;&#xa;• Open-Meteo Daily Plant Weather REST API&#xa;• Commodity (Titanium) &amp;amp; Treasury FX APIs&#xa;• SharePoint Online SOPs (~20K PDF/Markdown)" vertex="1">
+          <mxGeometry height="95" width="310" x="65" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="b_mexico" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3CD;strokeColor=#D97706;strokeWidth=2;dashed=1;fontSize=10.5;align=left;spacingLeft=10;fontColor=#92400E;" value="&lt;b&gt;MEXICO RESIDENCY BOUNDARY&lt;/b&gt;&#xa;&lt;b&gt;Dedicated Account: AWS Mexico (mx-central-1)&lt;/b&gt;&#xa;• QRO HR, Payroll, Timecards &amp;amp; PII Stay In-Country&#xa;• Local S3 + KMS CMK #3 + Glue, Athena &amp;amp; LF&#xa;• Allow-Listed Export Gate (Lambda/Glue):&#xa;  Exports ONLY De-identified MXN GL Rollups to US" vertex="1">
+          <mxGeometry height="150" width="310" x="65" y="765" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_ingest" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1E88E5;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#0D47A1;spacingTop=10;" value="2. INGEST (Streaming &amp; Batch)" vertex="1">
+          <mxGeometry height="1010" width="380" x="520" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="i1_iot" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;AWS IoT Core (MQTT Broker &amp;amp; Rules)&lt;/b&gt;&#xa;• Mutual TLS 1.2+ X.509 Gateway Auth&#xa;• Private Site-to-Site VPN / Direct Connect&#xa;• Routed via AWS Transit Gateway" vertex="1">
+          <mxGeometry height="95" width="330" x="545" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="i2_kds" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon Kinesis Data Streams&lt;/b&gt;&#xa;• On-Demand Mode (Multi-AZ Log Buffer)&#xa;• Sized for 20,000 msg/s Peak Burst (~20 MB/s)&#xa;• 480 msg/s Enterprise Avg | Partitioned by Machine" vertex="1">
+          <mxGeometry height="95" width="330" x="545" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="i3_flink" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon Data Firehose &amp;amp; Managed Flink&lt;/b&gt;&#xa;• Firehose: 60s Micro-batch GZIP to S3 Raw&#xa;• Managed Flink (ML Use Case #2): Sub-60s Streaming&#xa;  Anomaly Detection (Random Cut Forest)&#xa;• Flink Anomaly Sink via Kinesis / AWS Lambda" vertex="1">
+          <mxGeometry height="110" width="330" x="545" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="i4_dms" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;AWS DMS Serverless &amp;amp; Amazon AppFlow&lt;/b&gt;&#xa;• DMS Serverless: SQL Server MES &amp;amp; Master CDC&#xa;• AppFlow / Custom Lambda Connector:&#xa;  Hourly SaaS CMMS Work Order &amp;amp; Note Ingest" vertex="1">
+          <mxGeometry height="105" width="330" x="545" y="575" as="geometry" />
+        </mxCell>
+        <mxCell id="i5_transfer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;AWS Transfer Family &amp;amp; AWS Lambda&lt;/b&gt;&#xa;• Transfer Family (SFTP): Nightly ERP GL/AP/Budget,&#xa;  Master CSVs &amp;amp; CMM Inspection CSVs&#xa;• EventBridge + Lambda: Weather, FX, Commodity&#xa;  REST APIs, SharePoint SOPs &amp;amp; QRO GL Rollups" vertex="1">
+          <mxGeometry height="120" width="330" x="545" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="i6_cimarron" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0288D1;dashed=1;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Expansion Capacity: Cimarron (Site 13)&lt;/b&gt;&#xa;• Acquired 13th Facility (12+1 Topology)&#xa;• Pre-Allocated Capacity in Kinesis On-Demand,&#xa;  S3 Partition Namespaces &amp;amp; Glue Data Catalog" vertex="1">
+          <mxGeometry height="105" width="330" x="545" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_lake" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#1B5E20;spacingTop=10;" value="3. LAKE (Amazon S3 Medallion &amp; Glue ETL)" vertex="1">
+          <mxGeometry height="1010" width="560" x="1020" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="l1_raw" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon S3 — Raw Zone (Bronze)&lt;/b&gt;&#xa;• Immutable Landing: raw/iot_telemetry/, raw/mes/, raw/quality/,&#xa;  raw/cmms/, raw/erp/, raw/master/, raw/external/, docs/sop/&#xa;• 2-Yr Telemetry Lifecycle Tiering | 7-Yr SOX Finance (S3 Object Lock)" vertex="1">
+          <mxGeometry height="110" width="500" x="1050" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="l2_glue" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#1B5E20;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;AWS Glue ETL (Spark) + Glue Data Quality&lt;/b&gt;&#xa;• Amazon EMR Serverless for Heavy Historical Backfills&#xa;• De-duplication &amp;amp; Late-Arriving Telemetry Watermarks&#xa;• Unit (°F to °C) &amp;amp; Currency (MXN to USD) Standardization&#xa;• Missing Cost-Center &amp;amp; Duplicate AP Invoice Quarantine&#xa;• Executes Both Bronze-to-Silver &amp;amp; Silver-to-Gold Conform Jobs" vertex="1">
+          <mxGeometry height="135" width="330" x="1050" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="l3_quarantine" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;fontSize=10.5;align=center;" value="&lt;b&gt;S3 Quarantine&#xa;Bucket&lt;/b&gt;&#xa;Failed DQ Records&#xa;(Retained for Replay,&#xa;Never Dropped)&#xa;+ SNS Steward Alert" vertex="1">
+          <mxGeometry height="135" width="145" x="1405" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="l4_curated" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon S3 — Curated Zone (Silver)&lt;/b&gt;&#xa;• Cleaned, Validated &amp;amp; Deduplicated Entities (Parquet / Iceberg)&#xa;• Standardized Units (°C, kWh) &amp;amp; Currency (USD + Original MXN)&#xa;• Conformed Business Keys Across MES, CMMS, CMM &amp;amp; ERP" vertex="1">
+          <mxGeometry height="100" width="500" x="1050" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="l5_gold" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;strokeWidth=2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon S3 — Gold Zone (Apache Iceberg / S3 Tables)&lt;/b&gt;&#xa;&lt;b&gt;Single Authoritative Finance &amp;amp; Operations System of Record&lt;/b&gt;&#xa;• Conformed Star Schema — Facts: Telemetry/OEE, Production/Scrap,&#xa;  Maintenance, GL/AP/Budget | Dims: Plant, Machine, Part/Program, Supplier, CostCenter, Date&#xa;• Ready Daily by 07:00 CT | ACID Time-Travel | Read In-Place by Redshift &amp;amp; Part 2" vertex="1">
+          <mxGeometry height="140" width="500" x="1050" y="635" as="geometry" />
+        </mxCell>
+        <mxCell id="b_talon" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;strokeWidth=2;dashed=1;fontSize=10.5;align=left;spacingLeft=10;fontColor=#880E4F;" value="&lt;b&gt;TALON EXPORT-CONTROLLED BOUNDARY (ITAR / EAR)&lt;/b&gt;&#xa;&lt;b&gt;Dedicated US Account (us-east-1 Primary / us-west-2 DR) — US Persons Only&lt;/b&gt;&#xa;• Isolated S3 Buckets, Models, SOPs &amp;amp; Unexposed Iceberg Tables + KMS CMK #2 (isUSPerson = true)&#xa;• Lake Formation Cell Filter (program_code &amp;lt;&amp;gt; &#39;TALON&#39; for Non-US-Persons-TALON)&#xa;• Strictly Blocked from Non-US Persons &amp;amp; Part 2 Cross-Cloud Shortcuts" vertex="1">
+          <mxGeometry height="150" width="500" x="1050" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="l6_part2_hook" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;dashed=1;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Part 2 Multi-Cloud Read-In-Place Hook (Zero 3rd Copy)&lt;/b&gt;&#xa;• Microsoft Fabric OneLake S3 Shortcuts &amp;amp; Snowflake External Volumes&#xa;• Read-Only Access to Commercial Non-TALON Gold Iceberg Prefix Only" vertex="1">
+          <mxGeometry height="75" width="500" x="1050" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_serve" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FB8C00;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#E65100;spacingTop=10;" value="4. SERVE (Warehouse, Query &amp; ML)" vertex="1">
+          <mxGeometry height="1010" width="400" x="1700" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="sv1_redshift" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#F57C00;strokeWidth=2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon Redshift Serverless&lt;/b&gt;&#xa;• Primary AWS Serving Warehouse (RPU Cap &amp;amp; Auto-Pause)&#xa;• Reads S3 Gold Iceberg Tables In-Place (External Schema)&#xa;• Row-Level Security + Identity Propagation&#xa;• Aggregate-Only Materialized Views (Commercial Data Only)&#xa;• Governed Semantic Layer &amp;amp; Amazon Redshift ML" vertex="1">
+          <mxGeometry height="160" width="340" x="1730" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="sv2_athena" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#F57C00;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon Athena (Serverless SQL-on-Lake)&lt;/b&gt;&#xa;• Interactive Queries over Gold, Silver, Raw &amp;amp; Quarantine&#xa;• Enforced by AWS Lake Formation Grants &amp;amp; Cell Filters&#xa;• Data Quality Scorecard &amp;amp; SOX Time-Travel Audit Queries&#xa;• Workgroup Per-Query Scan Cost Controls" vertex="1">
+          <mxGeometry height="120" width="340" x="1730" y="365" as="geometry" />
+        </mxCell>
+        <mxCell id="sv3_sagemaker" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#F57C00;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon SageMaker AI (MLOps Platform, VPC-Only)&lt;/b&gt;&#xa;• Pipelines, Feature Store, Model Registry, Model Monitor&#xa;• Chronological Splits | Cost-Weighted PR-AUC / F-Beta&#xa;• All 5 Enterprise ML Use Cases:&#xa;  1. Predictive Maintenance: P(Failure within 48h)&#xa;  2. Streaming Anomaly Detection (in Managed Flink)&#xa;  3. Work-Order Scrap Risk Model&#xa;  4. Energy (kWh) &amp;amp; Titanium Cost Forecasting&#xa;  5. Variance Driver Analysis (SHAP Attribution)" vertex="1">
+          <mxGeometry height="215" width="340" x="1730" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="sv4_dynamodb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#F57C00;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon DynamoDB (Serverless NoSQL)&lt;/b&gt;&#xa;• Sub-10ms Live Machine Health &amp;amp; 48h Risk Scores&#xa;• Operational Context &amp;amp; Device State Lookup&#xa;• Immutable Agent Approval Audit Log (DynamoDB Stream)" vertex="1">
+          <mxGeometry height="130" width="340" x="1730" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_insight" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#4A148C;spacingTop=10;" value="5. INSIGHT (BI, Alerting &amp; Agentic AI)" vertex="1">
+          <mxGeometry height="1010" width="420" x="2220" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="in1_quicksight" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon QuickSight (Quick Suite)&lt;/b&gt;&#xa;• Plant Manager, Maintenance &amp;amp; Controller Dashboards&#xa;• Hourly Operational Refresh | Row-Level Security by Plant&#xa;• Automated Daily 07:00 CT Plant-to-P&amp;amp;L Executive Brief&#xa;• Data Quality Score Visibility &amp;amp; Natural-Language Q&amp;amp;A" vertex="1">
+          <mxGeometry height="140" width="360" x="2250" y="155" as="geometry" />
+        </mxCell>
+        <mxCell id="in2_alerts" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Real-Time Shop-Floor Alerting&lt;/b&gt;&#xa;• Amazon SNS &amp;amp; Amazon EventBridge&#xa;• Critical Machine Alarms Delivered within 60s&#xa;• Cell Lead, Maintenance &amp;amp; Data Steward Notifications" vertex="1">
+          <mxGeometry height="110" width="360" x="2250" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="in3_kb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon Bedrock Knowledge Bases &amp;amp; Guardrails&lt;/b&gt;&#xa;• Vector Store: Amazon OpenSearch Serverless&#xa;• RAG over ~20K SharePoint SOPs &amp;amp; CMMS Repair Notes&#xa;• KB Access Control: TALON SOPs Excluded / Metadata-Filtered&#xa;• Guardrails: Block PII, Off-Topic &amp;amp; Unsafe Output" vertex="1">
+          <mxGeometry height="135" width="360" x="2250" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="in4_agentcore" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#4A148C;strokeWidth=2;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Amazon Bedrock AgentCore (Anthropic Claude)&lt;/b&gt;&#xa;• AgentCore Runtime, Memory, Identity &amp;amp; Observability&#xa;• AgentCore Gateway (MCP Tools via AWS Lambda)&#xa;• AgentCore Identity Passes User Token (No Standing Grants)&#xa;• Multi-Agent System:&#xa;  1. Supervisor (&quot;AeroForge Copilot&quot;)&#xa;  2. Maintenance Advisor (Live Health + SOP RAG)&#xa;  3. Variance Analyst (Governed Text-to-SQL)&#xa;  4. Supply &amp;amp; Cost Agent (AP + Commodity PPV)" vertex="1">
+          <mxGeometry height="230" width="360" x="2250" y="645" as="geometry" />
+        </mxCell>
+        <mxCell id="in5_hitl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#AD1457;fontSize=10.5;align=left;spacingLeft=10;" value="&lt;b&gt;Human-in-the-Loop Action Approval&lt;/b&gt;&#xa;• Mandatory Supervisor Approval Gate (Step Functions)&#xa;• Approves Drafted P1 Maintenance Work Orders&#xa;• Invokes Gateway Lambda to SaaS CMMS &amp;amp; Cell Lead SNS&#xa;• Logs Caller &amp;amp; Approver Identity to DynamoDB / CloudTrail" vertex="1">
+          <mxGeometry height="135" width="360" x="2250" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="bg_crosscut" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#455A64;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#263238;spacingTop=10;" value="6. CROSS-CUTTING ENTERPRISE SERVICES (Orchestration, Identity &amp; Security, Governance, Monitoring &amp; DR, Cost &amp; FinOps)" vertex="1">
+          <mxGeometry height="230" width="2600" x="40" y="1160" as="geometry" />
+        </mxCell>
+        <mxCell id="cc1_orch" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#37474F;fontSize=10.5;align=left;spacingLeft=12;" value="&lt;b&gt;Orchestration, DevOps &amp;amp; Compute Elasticity&lt;/b&gt;&#xa;• AWS Step Functions &amp;amp; Amazon EventBridge Scheduler&#xa;• Infrastructure as Code: Terraform / AWS CDK / CloudFormation&#xa;• CI/CD: GitHub Actions &amp;amp; AWS CodePipeline (PR Approval for SOX)&#xa;• EC2 Auto Scaling &amp;amp; Elastic Load Balancing (Gateway Fleet)" vertex="1">
+          <mxGeometry height="150" width="480" x="65" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="cc2_sec" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#37474F;fontSize=10.5;align=left;spacingLeft=12;" value="&lt;b&gt;Security, Identity &amp;amp; Multi-Account Landing Zone&lt;/b&gt;&#xa;• AWS Organizations &amp;amp; Control Tower (5 Accounts: Mgmt, Sec, US, TALON, Mex)&#xa;• SCPs &amp;amp; IAM Identity Center (SSO + MFA; isUSPerson, plant_code, role)&#xa;• AWS KMS (CMK #1 Comm/SOX, CMK #2 TALON, CMK #3 Mex, CMK #4 Audit)&#xa;• Secrets Manager, GuardDuty, Security Hub, Macie, CloudTrail, AWS Config" vertex="1">
+          <mxGeometry height="150" width="510" x="570" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="cc3_gov" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#37474F;fontSize=10.5;align=left;spacingLeft=12;" value="&lt;b&gt;Catalog, Lineage &amp;amp; AI/Data Governance&lt;/b&gt;&#xa;• AWS Glue Data Catalog (Central Apache Iceberg Metadata)&#xa;• AWS Lake Formation (LF-Tags: Domain, Zone, Sensitivity, Plant, Residency)&#xa;• SOX Segregation of Duties (LF Admin, Pipeline Deployer, Finance Approver)&#xa;• Amazon SageMaker Unified Studio &amp;amp; 7-Year WORM Audit Archive" vertex="1">
+          <mxGeometry height="150" width="490" x="1105" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="cc4_mon" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#37474F;fontSize=10.5;align=left;spacingLeft=12;" value="&lt;b&gt;Monitoring, Observability &amp;amp; Disaster Recovery&lt;/b&gt;&#xa;• Amazon CloudWatch (Metrics, Logs, Alarms), AWS X-Ray &amp;amp; Amazon SNS&#xa;• Ingestion Availability: 99.9% | Multi-AZ Active across All Tiers&#xa;• Telemetry RPO 15m / RTO 4h | Warehouse RPO 24h / RTO 8h&#xa;• Cross-Region DR (us-east-1 to us-west-2 CRR &amp;amp; AWS Backup; Mex In-Country)" vertex="1">
+          <mxGeometry height="150" width="490" x="1620" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="cc5_cost" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#37474F;fontSize=10.5;align=left;spacingLeft=12;" value="&lt;b&gt;Cost Management &amp;amp; FinOps&lt;/b&gt;&#xa;• Pilot Run-Rate Target: Under $18,000/month (Scenario A 3-Plant Pilot)&#xa;• AWS Budgets, Cost Anomaly Detection, Cost Explorer &amp;amp; CUR 2.0&#xa;• Org Tag Policies &amp;amp; Showback (plant, domain, environment, owner)&#xa;• Levers: S3 Tiering, Redshift RPU Cap, Athena Limits, Gateway Endpoints, Savings Plans" vertex="1">
+          <mxGeometry height="150" width="475" x="2135" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="s1_edge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1976D2;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;" target="i1_iot" value="① MQTT Telemetry">
+          <mxGeometry relative="1" y="28" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="i1_iot" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1976D2;fontSize=10.5;labelBackgroundColor=#FFFFFF;" target="i2_kds" value="② IoT Rules">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="i2_kds" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1976D2;fontSize=10.5;labelBackgroundColor=#FFFFFF;" target="i3_flink" value="③ Stream (20K msg/s burst)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="i3_flink" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2E7D32;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="l1_raw" value="④ Micro-batch JSONL.gz">
+          <mxGeometry relative="1" y="-40" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="940" y="475" />
+              <mxPoint x="940" y="183" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="i3_flink" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C62828;dashed=1;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.35;entryDx=0;entryDy=0;" target="in2_alerts" value="⑤ Under-60s Anomaly Alert (Lambda to SNS)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="915" y="448" />
+              <mxPoint x="915" y="92" />
+              <mxPoint x="2660" y="92" />
+              <mxPoint x="2660" y="369" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="s2_mes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#495057;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" target="i4_dms" value="⑥ SQL CDC">
+          <mxGeometry relative="1" x="0.0078" y="-30" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="430" y="330" />
+              <mxPoint x="430" y="607" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="s3_cmm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#495057;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" target="i4_dms" value="⑦ CMMS REST API">
+          <mxGeometry relative="1" y="15" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="455" y="433" />
+              <mxPoint x="455" y="649" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7b" edge="1" parent="1" source="s3_cmm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#495057;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.15;entryDx=0;entryDy=0;" target="i5_transfer" value="⑧ CMM CSV (SFTP)">
+          <mxGeometry relative="1" y="-25" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="480" y="471" />
+              <mxPoint x="480" y="748" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="s4_erp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#495057;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.4;entryDx=0;entryDy=0;" target="i5_transfer" value="⑨ ERP Nightly SFTP">
+          <mxGeometry relative="1" y="-15" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="500" y="568" />
+              <mxPoint x="500" y="778" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="s5_ext" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#495057;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.65;entryDx=0;entryDy=0;" target="i5_transfer" value="⑩ REST APIs &amp;amp; SOPs">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="445" y="688" />
+              <mxPoint x="445" y="808" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="b_mexico" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#D97706;dashed=1;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.9;entryDx=0;entryDy=0;" target="i5_transfer" value="⑪ De-identified MXN GL Rollups Only">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="840" />
+              <mxPoint x="470" y="838" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="i4_dms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#2E7D32;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="l1_raw" value="⑫ CDC &amp;amp; CMMS Land">
+          <mxGeometry relative="1" y="40" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="965" y="628" />
+              <mxPoint x="965" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="i5_transfer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#2E7D32;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="l1_raw" value="⑬ Batch CSV, JSON &amp;amp; SOPs">
+          <mxGeometry relative="1" y="120" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="995" y="790" />
+              <mxPoint x="995" y="238" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="l1_raw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2E7D32;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=0.33;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="l2_glue" value="⑭ Read Raw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="l2_glue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#C62828;fontSize=10.5;labelBackgroundColor=#FFFFFF;" target="l3_quarantine" value="⑮ DQ Rejects">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="l2_glue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2E7D32;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.33;entryY=0;entryDx=0;entryDy=0;" target="l4_curated" value="⑯ Write Validated Silver">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="l4_curated" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1B5E20;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;" target="l5_gold" value="⑰ Conform Gold Star Schema (Glue ETL Spark)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="l5_gold" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#E65100;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="sv1_redshift" value="⑱ External Schema Read In-Place">
+          <mxGeometry relative="1" x="0.122" y="-25" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1635" y="670" />
+              <mxPoint x="1635" y="235" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="l5_gold" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#F57C00;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="sv2_athena" value="⑲ SQL-on-Lake (Gold, Silver, Raw &amp;amp; Quarantine)">
+          <mxGeometry relative="1" x="0.3043" y="15" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1665" y="705" />
+              <mxPoint x="1665" y="425" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="l4_curated" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#F57C00;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="sv3_sagemaker" value="⑳ Training &amp;amp; Features">
+          <mxGeometry relative="1" x="0.1258" y="-31" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1605" y="540" />
+              <mxPoint x="1605" y="589" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="sv3_sagemaker" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#1B5E20;dashed=1;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" target="l5_gold" value="㉑ Batch Predictions &amp;amp; SHAP">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1690" y="696" />
+              <mxPoint x="1690" y="740" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="sv3_sagemaker" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#F57C00;fontSize=10.5;labelBackgroundColor=#FFFFFF;" target="sv4_dynamodb" value="㉒ Live 48h Risk Scores">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="l5_gold" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#3949AB;dashed=1;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="l6_part2_hook" value="㉓ Zero-Copy Read">
+          <mxGeometry relative="1" x="-0.0016" y="-32" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1032" y="747" />
+              <mxPoint x="1032" y="1038" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e23" edge="1" parent="1" source="sv1_redshift" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#7B1FA2;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" target="in1_quicksight" value="㉔ Governed BI Queries">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e24" edge="1" parent="1" source="sv2_athena" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#7B1FA2;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="in1_quicksight" value="㉕ Ad-hoc &amp;amp; DQ Metrics">
+          <mxGeometry relative="1" y="20" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="2135" y="425" />
+              <mxPoint x="2135" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e25" edge="1" parent="1" source="l1_raw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#7B1FA2;dashed=1;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="in3_kb" value="㉖ SOP Docs &amp;amp; CMMS Notes Sync">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1300" y="100" />
+              <mxPoint x="2195" y="100" />
+              <mxPoint x="2195" y="543" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e26" edge="1" parent="1" source="in3_kb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4A148C;fontSize=10.5;labelBackgroundColor=#FFFFFF;" target="in4_agentcore" value="㉗ Grounded RAG + Guardrails">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e27" edge="1" parent="1" source="sv1_redshift" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;endArrow=classic;strokeWidth=1.5;strokeColor=#4A148C;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" target="in4_agentcore" value="㉘ Text-to-SQL MCP Tool (Redshift Data API)">
+          <mxGeometry relative="1" y="50" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="2165" y="275" />
+              <mxPoint x="2165" y="714" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e28" edge="1" parent="1" source="sv4_dynamodb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;endArrow=classic;strokeWidth=1.5;strokeColor=#4A148C;fontSize=10.5;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" target="in4_agentcore" value="㉙ Live Risk State Lookup (MCP Tool)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2195" y="862" />
+              <mxPoint x="2195" y="818" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e29" edge="1" parent="1" source="in4_agentcore" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#AD1457;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;" target="in5_hitl" value="㉚ Draft P1 CMMS Work Order">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e30" edge="1" parent="1" source="in5_hitl" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#AD1457;dashed=1;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.8;entryDx=0;entryDy=0;" target="sv4_dynamodb" value="㉛ Approved Action: Audit Log &amp;amp; CMMS Dispatch">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2165" y="988" />
+              <mxPoint x="2165" y="914" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e30b" edge="1" parent="1" source="in5_hitl" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1.5;strokeColor=#AD1457;dashed=1;fontSize=10.5;fontStyle=1;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" target="in2_alerts" value="㉜ Notify Cell Lead (SNS)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2635" y="988" />
+              <mxPoint x="2635" y="407" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
