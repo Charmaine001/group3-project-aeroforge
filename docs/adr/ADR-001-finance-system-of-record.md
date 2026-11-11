@@ -1,58 +1,21 @@
-# ADR-001: Finance System of Record
+# ADR-001 Finance System of Record
 
-**Status:** Draft | **Date:** 2026-10-27 | **Scope:** Part 1 (AWS), with read-side rules for Part 2
+**Status:** Proposed for team review | **Reviewed and revised by:** Wali | **Date:** 2026-11-11
 
 ## Context
-Official P&L and Plant-to-P&L numbers need one authoritative source, or close stays slow and variances untraceable. Part 2 adds Fabric, Databricks and Snowflake (the CFO's finance-warehouse choice); the CIO's rule is "no third copy". The professor said to pick one platform for official numbers and keep that rule. *Assumption (confirm):* the on-prem ERP stays the book of original entry; "system of record" here means the authoritative analytical record.
+AeroForge needs one authoritative analytical record for official finance and Plant-to-P&L reporting by 07:00 CT. The diagram puts gold Iceberg tables in S3 and queries them through Redshift Serverless. Part 2 must reuse the record without a third persisted copy of the same gold rows. We assume ERP remains the accounting book of original entry; the team must confirm that distinction. Finance evidence requires seven-year retention; Mexico payroll/HR and TALON stay within their approved boundaries.
 
-## Requirements and constraints
-- One authoritative store; SOX audit trail and as-of queries; gold ready by 07:00 CT; 7-year finance retention.
-- Part 2 reads the same data in place. Mexico payroll/HR stays in Mexico; TALON stays in US regions.
-- Streaming sized for 20,000 msg/s; Scenario A (3 plants) and B (12 plants). Data Pack and DATA_DICTIONARY not provided, so schemas are provisional.
+## Options
+1. **S3 gold Iceberg with Redshift serving:** Fits AWS ingestion, Glue and Lake Formation; separates durable tables from query compute. Cross-cloud reads add transfer cost and compatibility work.
+2. **Snowflake authoritative warehouse:** Fits the CFO's preference. Loading gold into managed tables adds a replica; externally managed Iceberg can reuse S3 but leaves authoritative files there.
+3. **Fabric authoritative lakehouse:** Fits Power BI and Part 2. Loading gold into OneLake adds a replica; compatible shortcuts need validation and do not make OneLake authoritative.
 
-## Options considered
-1. **AWS: S3 gold Iceberg + Redshift Serverless.** Pros: ingest, Glue, Lake Formation and ML already on AWS; Iceberg snapshots allow as-of reads (Athena/Spark); open readers. Cons: Part 2 reads cross clouds (egress, latency).
-2. **Snowflake.** Pros: CFO preference; masking, row access, sharing. Cons: Snowflake-managed storage would copy AWS-landed data; external Iceberg storage is still AWS; Part 1 already requires an AWS warehouse, so two compete.
-3. **Fabric/OneLake.** Pros: Direct Lake, Power BI, Fabric IQ. Cons: needs data moved into OneLake (a copy) or the AWS plant platform reversed; Fabric IQ ontology still preview.
+## Decision
+Keep **S3 gold Iceberg, registered in Glue and governed through Lake Formation, as the authoritative analytical finance record**. Redshift Serverless serves approved queries through an external schema; ADR-005 owns engine selection. Writers reconcile gold to ERP and record reporting cutoff, batch and table snapshot IDs before finance approves a published close.
 
-## Decision (binding)
-S3 gold Iceberg tables (Glue Data Catalog, Lake Formation) are the single authoritative source. Redshift Serverless is the AWS serving engine over them. Part 2 reads in place.
+My trade-off is to prioritize consistent, traceable official numbers over each platform's fastest local storage. Prohibit same-grain persisted replicas such as gold CTAS/INSERT copies and BI imports. Allow only approved, rebuildable aggregates and bounded caches with documented ownership, expiry and access controls. Part 2 integrations must prove compatible format, read-only access and acceptable egress before adoption.
 
-## Rationale
-**What counts as a copy:**
+## Consequences
+Cross-cloud latency and egress remain costs without duplicated tables. Enforce restrictions in each consumer. Do not expose TALON or Mexico payroll/HR through commercial shortcuts or agents; only approved exports enter shared gold. Iceberg snapshots alone do not guarantee seven-year history: preserve required metadata and referenced files under a tested retention policy. Object Lock protects object versions, not table consistency or accounting approval. Use an Iceberg-capable engine for historical audits; do not assume Redshift supports time travel. Confirm general-purpose S3 versus S3 Tables compatibility with the architect before Part 2 integration.
 
-| Class | Test | Examples | Status |
-|---|---|---|---|
-| Authoritative | Official numbers originate here | Gold Iceberg (Parquet + metadata) | Exactly one |
-| Copy | Persisted, queryable replica of gold rows at the same grain | Redshift local table via INSERT/CTAS; Delta in OneLake/ADLS; Snowflake-managed Iceberg; Power BI Import | Prohibited |
-| Derived | Persisted coarser-grain result, rebuildable, labelled non-authoritative | Redshift aggregate MV | Allowed, controlled |
-| Metadata/cache | Pointers, stats, in-memory or time-limited caches; never a table source | Virtual `_delta_log`, Direct Lake memory, shortcut cache (1-28 days) | Allowed |
-
-An MV that merely selects gold rows is a copy. **Redshift tables loaded from gold are a third copy.** The pattern that keeps the rule: an external schema on the Glue catalog (Redshift queries Iceberg in place) plus aggregate-only MVs.
-
-**Part 2 in place:** Fabric uses a read-only S3 shortcut to the Iceberg folder; OneLake generates virtual Delta metadata, Parquet stays in S3. Snowflake uses a catalog integration to an externally managed Iceberg table; files stay in S3. Both avoid a copy only if nobody runs Copy jobs, Import mode, CTAS or conversion on gold.
-
-**Egress/latency:** zero-copy storage is not zero-cost compute. Uncached cross-cloud scans are billed by AWS as egress and add latency. Mitigate with compact gold marts, partition pruning, shortcut caching, Direct Lake, and Azure capacity near the AWS region.
-
-## Consequences and trade-offs
-Part 2 cost and speed depend on AWS egress. Gold commits must be 2+ minutes apart for Fabric conversion (nightly/hourly loads fit). Fabric cannot time-travel older snapshots; as-of audits run in Athena/Spark.
-
-## Security and cost implications
-- The Fabric S3 shortcut uses one long-lived IAM-user key for all its users; CloudTrail shows the key, not the person. Scope it read-only and by prefix; enforce per-user access in Fabric.
-- Snowflake can write to externally managed Iceberg, so read-only must come from IAM and Lake Formation.
-- External-engine setup requires full-table access, so row filters likely cannot protect TALON. Keep TALON and Mexico HR data in separate, unexposed tables; exposure is the compliance owner's call.
-- Redshift MVs ignore later Lake Formation revocations; no MVs over restricted data.
-- Cost: cross-cloud GB scanned × AWS egress rate, tagged per consumer, for Scenarios A and B.
-
-## Dependencies and unresolved questions
-- Is the ERP the book of original entry?
-- Where do Cimarron's ledger and Snowflake consolidation outputs live?
-- S3 Tables or self-managed Iceberg (ADR-003)? Fabric shortcuts need a general-purpose bucket.
-- Snapshot retention versus 7-year as-of queries.
-
-## Facts verified or UNVERIFIED
-**Verified (official docs):** OneLake virtualizes S3 Iceberg as Delta (Parquet only, latest metadata only, no Private Link); S3 shortcuts are read-only, IAM-user key, optional cache; Snowflake supports cross-cloud external-catalog Iceberg, egress billed by storage provider; Redshift queries Iceberg in place, supports MVs, no Iceberg time travel; Direct Lake caches columns in memory.
-**UNVERIFIED:** shortcuts to S3 Tables buckets; Lake Formation row filters for Fabric/Snowflake reads; the ~$0.09/GB egress rate (third-party sources only); Snowflake auditor sharing of external Iceberg; Databricks-on-Azure reading AWS gold; Redshift writing Iceberg.
-
-## AI-use disclosure
-Drafted with Claude (Anthropic), 2026-10-27, to cross-check the Gemini-written baseline against the project documents and vendor docs. Team must re-verify UNVERIFIED items. Not legal advice.
+**AWS references:** [Iceberg support](https://docs.aws.amazon.com/redshift/latest/dg/querying-iceberg.html), [external schemas](https://docs.aws.amazon.com/redshift/latest/dg/referencing-iceberg-tables.html), [Object Lock](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html). Revised with ChatGPT assistance; Wali and a teammate must review before acceptance.
