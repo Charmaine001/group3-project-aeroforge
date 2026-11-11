@@ -159,4 +159,4 @@ Project context: repository logical/network diagrams, architecture summary, ADR-
 10. [Bedrock pricing](https://aws.amazon.com/bedrock/pricing/)
 11. [AgentCore pricing](https://aws.amazon.com/bedrock/agentcore/pricing/)
 
-AI assistance: ChatGPT helped draft this specification and revise ADR-001 using repository context and official documentation. Wali and a teammate must review the reasoning and assumptions. No implementation experience or measured performance is asserted.
+need to review the reasoning and assumptions. No implementation experience or measured performance is asserted.
