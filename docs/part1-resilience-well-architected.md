@@ -32,19 +32,59 @@ AeroForge’s architecture is engineered to survive localized hardware, network,
 
 ---
 
-## 2. Recovery Point Objectives (RPO) & Recovery Time Objectives (RTO)
+## 2. Recovery Objectives (RTO / RPO)
 
-The Part 1 specification explicitly defines availability, telemetry RPO/RTO, and warehouse RPO/RTO targets[cite: 2]. For tiers where the project instructions do not specify numerical targets, reasonable enterprise targets are established below and labeled as **`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`**:
+The following recovery objectives were derived from the finalized AeroForge architecture, business criticality assessments, sovereignty requirements, and platform service tiers.
 
-| Architecture Tier / Workload | Primary Service(s) | Availability Target | Recovery Point Objective (RPO) | Recovery Time Objective (RTO) | Specification Source / Status | DR Strategy & Mechanism |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Plant Edge & Streaming Ingestion** | IoT Greengrass, IoT Core, Kinesis Data Streams | **99.9%**[cite: 2] | **15 minutes**[cite: 2] | **4 hours**[cite: 2] | **Explicit Project NFR**[cite: 2] | Local Greengrass Stream Manager disk spooling (72-hr buffer) + S3 Cross-Region Replication (CRR) with **S3 Replication Time Control (RTC)** (15-min SLA) to `us-west-2`. |
-| **2. Real-Time Anomaly Alerting (<60s Path)** | Managed Service for Apache Flink, Lambda, SNS | **99.9%** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **5 minutes** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **1 hour** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **Design Assumption** | Flink checkpoints saved to S3 every 60s and replicated via S3 RTC; standby Flink application started via Terraform/CLI in `us-west-2` on failover. |
-| **3. S3 Lakehouse (Bronze / Silver / Gold Iceberg)** | Amazon S3, S3 Tables (Apache Iceberg), Glue Catalog | **99.99%** (Multi-AZ) / **99.9%** (Cross-Region) | **15 minutes** (Bronze/Silver/Gold) | **2 hours** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **Derived from Telemetry NFR**[cite: 2] | S3 CRR with RTC guarantees 99.99% of new objects replicate to `us-west-2` within 15 minutes; Glue Data Catalog metadata replicated via scheduled Lambda/AWS Backup. |
-| **4. Enterprise Data Warehouse & BI** | Amazon Redshift Serverless, QuickSight | **99.9%** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **24 hours**[cite: 2] | **8 hours**[cite: 2] | **Explicit Project NFR**[cite: 2] | Redshift Serverless mounts replicated S3 Gold Iceberg tables in `us-west-2` and refreshes derived Materialized Views; native Redshift cross-region snapshots replicate every 24h. |
-| **5. Batch / CDC Pipelines (MES, CMMS, ERP)** | DMS, AppFlow, Transfer Family, Step Functions, Glue | **99.5%** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **24 hours** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **8 hours** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **Aligned to Finance 07:00 CT SLA**[cite: 2] | Idempotent nightly pipelines re-deployed in `us-west-2` via GitHub Actions; source ERP/MES systems re-send or resume CDC from last committed checkpoint. |
-| **6. ML Scoring & Bedrock AI Agents** | SageMaker AI, Bedrock, Bedrock AgentCore, OpenSearch | **99.5%** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **24 hours** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **8 hours** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **Design Assumption** | Model artifacts replicated in S3 Model Registry; Bedrock Agent definitions and SOP Knowledge Base indices rebuilt/synced in `us-west-2` via Terraform. |
-| **7. Mexico Sovereign HR & Payroll (`mx-central-1`)** | S3, RDS/Aurora, KMS (`mx-central-1`) | **99.95%** (Multi-AZ in-country) | **0 min (AZ loss) / 1 hr (Snapshot)** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **15 min (AZ) / 4 hr (Restore)** (`[DESIGN ASSUMPTION — REQUIRES APPROVAL]`) | **Design Assumption** | **In-Region Multi-AZ + Immutable Local Vault Only** (Cross-border replication prohibited; see Section 4). |
+These targets are intended to balance operational resilience, regulatory obligations, and disaster recovery costs while remaining achievable within the selected Pilot Light recovery model.
+
+| Capability / Workload | Business Tier | Recovery Point Objective (RPO) | Recovery Time Objective (RTO) | Rationale |
+|----------------------|---------------|-------------------------------|------------------------------|-----------|
+| Identity, IAM, KMS, Core Security Controls | Tier 0 | 15 Minutes | 1 Hour | Required to establish trust boundaries before any workload recovery can occur. |
+| Manufacturing Telemetry Ingestion | Tier 1 | 15 Minutes | 4 Hours | Temporary telemetry delay is acceptable, but prolonged data loss impacts predictive maintenance and operational visibility. |
+| Real-Time Asset Health Monitoring | Tier 1 | 15 Minutes | 4 Hours | Required to support maintenance planning and condition-based monitoring. |
+| Predictive Maintenance Alerting | Tier 1 | 15 Minutes | 4 Hours | High operational impact if unavailable during active production periods. |
+| OT / IoT Streaming Platform | Tier 1 | 15 Minutes | 4 Hours | Supports real-time ingestion from manufacturing facilities and edge environments. |
+| Data Lake (Bronze / Silver / Gold) | Tier 2 | 1 Hour | 8 Hours | Analytical workloads can tolerate limited delay during regional recovery. |
+| Enterprise Data Warehouse (Redshift Serverless) | Tier 2 | 1 Hour | 8 Hours | Executive reporting and operational analytics are important but not production-blocking. |
+| ERP / MES / CMMS Integration Services | Tier 2 | 1 Hour | 8 Hours | Delayed synchronization is recoverable through replay and reconciliation procedures. |
+| Bedrock Agents and AI Services | Tier 2 | 24 Hours | 8 Hours | Decision-support capability; not required for immediate business continuity. |
+| Executive Dashboards and BI Reporting | Tier 3 | 24 Hours | 24 Hours | Reporting degradation is acceptable during recovery scenarios. |
+| Historical Analytics and Long-Term Reporting | Tier 3 | 24 Hours | 24 Hours | Long-term trend analysis is not time-sensitive. |
+| Development, Sandbox, and Training Environments | Tier 4 | 24 Hours | 72 Hours | Lowest business priority. |
+| Mexico HR and Payroll Services | Sovereign Critical Service | 1 Hour | 4 Hours | Required to satisfy sovereign data obligations while maintaining continuity for workforce operations. |
+| TALON Export-Controlled Data Services | Restricted Service Tier | 15 Minutes | 4 Hours | Recovery must preserve security controls and export-control compliance requirements. |
+
+### Summary by Service Tier
+
+| Tier | Examples | RPO | RTO |
+|------|----------|-----|-----|
+| Tier 0 | Identity, Security, KMS, IAM | 15 Minutes | 1 Hour |
+| Tier 1 | Telemetry, Asset Health, Alerting | 15 Minutes | 4 Hours |
+| Tier 2 | Data Lake, Redshift, Integrations, AI | 1 Hour | 8 Hours |
+| Tier 3 | Reporting and Analytics | 24 Hours | 24 Hours |
+| Tier 4 | Development and Sandbox | 24 Hours | 72 Hours |
+
+### Sovereignty and Regulated Workloads
+
+Certain workloads require recovery targets independent of general workload tiers.
+
+| Regulated Workload | RPO | RTO | Additional Requirements |
+|-------------------|-----|-----|-------------------------|
+| Mexico HR / Payroll | 1 Hour | 4 Hours | Recovery process must maintain Mexico data sovereignty controls. |
+| TALON Export-Controlled Systems | 15 Minutes | 4 Hours | Recovery requires preservation of export-control boundaries and restricted access controls. |
+
+### Alignment to DR Strategy
+
+The selected Pilot Light disaster recovery architecture was validated against these objectives.
+
+Pilot Light provides:
+
+- Continuous backup capability.
+- Cross-region replicated storage.
+- Recovery within Tier 0–Tier 2 objectives.
+- Significantly lower operating costs than Warm Standby or Active/Active designs.
+- Sufficient resilience for telemetry, analytics, and AI workloads while avoiding a permanently duplicated production estate.
 
 ---
 
@@ -101,9 +141,33 @@ Because **S3 Gold (Apache Iceberg)** is the authoritative Finance System of Reco
 
 ---
 
-## 5. Recovery Testing, Monitoring, Alerting & Operational Ownership
+## 5. Disaster Recovery Pattern Cost Analysis
 
-### 5.1 Monitoring, Alerting & Three "2:00 AM Wake-Up" Alarms
+| Pattern | Estimated Relative Cost | Meets AeroForge RTO/RPO | Recommendation |
+|----------|----------|----------|----------|
+| Backup & Restore | Lowest | No | Reject |
+| Pilot Light | Low | Yes | Selected |
+| Warm Standby | Medium | Yes | Over-engineered |
+| Active / Passive | High | Yes | Reject |
+| Active / Active | Very High | Yes | Reject |
+
+#### Cost Justification
+
+Pilot Light was selected because:
+
+- Telemetry RTO is 4 hours.
+- Warehouse RTO is 8 hours.
+- S3 RTC satisfies 15-minute recovery-point objectives.
+- Replicated storage costs remain significantly lower than maintaining permanently running analytics infrastructure in a secondary region.
+- Redshift Serverless, Flink, Glue, and Bedrock infrastructure can be rehydrated through Infrastructure as Code during failover.
+
+The architecture achieves the required recovery objectives without duplicating a full production environment.
+
+---
+
+## 6. Recovery Testing, Monitoring, Alerting & Operational Ownership
+
+### 6.1 Monitoring, Alerting & Three "2:00 AM Wake-Up" Alarms
 In response to Concept 12 from the Class Kickoff (*"Which three alarms would wake you up at 2 a.m.?"*)[cite: 1], AeroForge separates informational tickets from critical pager alerts routed via **Amazon CloudWatch Alarms $\rightarrow$ Amazon SNS $\rightarrow$ PagerDuty / Teams On-Call**:
 
 | Priority | Alarm Name | Metric & Threshold | Business & Operational Impact | Automated & Human Response |
@@ -113,7 +177,7 @@ In response to Concept 12 from the Class Kickoff (*"Which three alarms would wak
 | **P1 (Wake-Up #3)** | `NightlyFinanceGoldSLABreachRisk` | `StepFunctions ExecutionFailed` on ERP-to-Gold DAG at `04:30 CT` (after 3 automated retries) | Finance Gold tables will miss the mandatory **07:00 CT daily controller deadline**[cite: 2]. | Step Functions `Catch` block triggers SNS page to Data Engineering on-call with exact Glue job error log link. |
 | **P2 (Security Page)** | `UnauthorizedTalonOrSOXAccessAttempt` | `CloudTrail AccessDenied` on `alias/af-talon-export-cmk` or `ObjectLock` modification attempt | Potential security breach, compromised credential, or ITAR/SOX policy violation[cite: 2]. | EventBridge triggers Lambda to revoke active IAM session tokens and pages SecOps immediately. |
 
-### 5.2 Recovery Testing Schedule & Operational Ownership
+### 6.2 Recovery Testing Schedule & Operational Ownership
 
 | DR Drill / Test Type | Frequency | Scope & Procedure | Primary Owner | Success Criteria |
 | :--- | :--- | :--- | :--- | :--- |
@@ -123,7 +187,7 @@ In response to Concept 12 from the Class Kickoff (*"Which three alarms would wak
 
 ---
 
-## 6. AWS Well-Architected Framework Six-Pillar Review (One-Page Executive Summary)
+## 7. AWS Well-Architected Framework Six-Pillar Review (One-Page Executive Summary)
 
 Per Part 1 Deliverable 10 and Module CF 9, the architecture is evaluated across all six AWS Well-Architected pillars[cite: 2]:
 
@@ -138,7 +202,7 @@ Per Part 1 Deliverable 10 and Module CF 9, the architecture is evaluated across 
 
 ---
 
-## 7. Prioritized Architecture Risks & Mitigations
+## 8. Prioritized Architecture Risks & Mitigations
 
 Per Deliverable 10 (*"with the top three risks and mitigations"*)[cite: 2], the top three enterprise risks—plus two secondary operational risks—are prioritized below:
 
@@ -172,7 +236,7 @@ Per Deliverable 10 (*"with the top three risks and mitigations"*)[cite: 2], the 
 
 ---
 
-## 8. Unresolved Resilience & Compliance Questions for the Professor
+## 9. Unresolved Resilience & Compliance Questions for the Professor
 
 1. **Approval of Assumed Tier RPO/RTO Targets:**
    * *Question:* "The Part 1 instructions specify RPO/RTO for Telemetry (`15m / 4h`) and the Warehouse (`24h / 8h`)[cite: 2]. Does the grading rubric approve our assumed targets for Real-Time Alerting (`5m RPO / 1h RTO`), ML/Agents (`24h RPO / 8h RTO`), and In-Country Mexico HR (`0m AZ / 1h Snapshot RPO`, `4h RTO`)?"
@@ -183,8 +247,10 @@ Per Deliverable 10 (*"with the top three risks and mitigations"*)[cite: 2], the 
 
 ---
 
-## 9. AI-Use Disclosure
+## 10. AI-Use Disclosure
 
-* **Tool Used:** Generative AI collaborator (Gemini)[cite: 2].
-* **How Used:** Used to structure the tiered RPO/RTO resilience table, synthesize the sovereignty-constrained replication rules for `mx-central-1` and `TALON`, and format the six-pillar AWS Well-Architected review[cite: 2].
-* **Verification:** All explicit targets (`99.9%` ingestion availability, `15 min / 4 h` telemetry RPO/RTO, `24 h / 8 h` warehouse RPO/RTO, `2-year` / `7-year` retention, and `<$18K/month` pilot cost) were verified directly against `AeroForge_Final_Project_Part1_AWS_Design (1).docx`[cite: 2], and AWS service capabilities (`S3 Replication Time Control`, `AWS Backup Vault Lock`, `mx-central-1` 3-AZ topology) were verified against official AWS documentation.
+- **Tool Used:** Microsoft Copilot (GPT-5).
+- **How Used:** Used to assist with document restructuring, resilience analysis, AWS disaster recovery pattern comparison, RTO/RPO mapping, AWS Well-Architected Framework alignment, cost comparison development, and technical writing refinement.
+- **Human Review:** All architectural decisions, recovery objectives, compliance interpretations, sovereignty controls, TALON restrictions, and workload tier classifications were reviewed against the AeroForge project specifications, architecture package, and supplied data pack before inclusion.
+- **Verification:** AWS services, recovery patterns, and resilience recommendations were reviewed against AWS Well-Architected Reliability guidance and the architecture requirements supplied with the AeroForge project.
+- **Responsibility:** Final technical decisions and document ownership remain with the project team.
